@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class RedmineGitHostingController < ApplicationController
+  protect_from_forgery with: :exception
   include XitoliteRepositoryFinder
 
   before_action :require_login
