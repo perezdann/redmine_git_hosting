@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class GitolitePublicKeysController < ApplicationController
+  protect_from_forgery with: :exception
   include RedmineGitHosting::GitoliteAccessor::Methods
 
   before_action :require_login
