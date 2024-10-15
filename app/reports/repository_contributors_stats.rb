@@ -70,7 +70,12 @@ class RepositoryContributorsStats < ReportBase
       # skip all registered users
       next if registered_committers.include? committer
 
-      name = committer.gsub(/<.+@.+>/, '').strip
+      name = committer
+      previous = nil
+      while name != previous
+        previous = name
+        name = name.gsub(/<.+@.+>/, '').strip
+      end
       mail = committer[/<(.+@.+)>/, 1]
       merged << { name: name, mail: mail, commits: count, changes: changes_by_author[committer] || 0, committers: [committer] }
     end
