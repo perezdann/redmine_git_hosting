@@ -65,7 +65,7 @@ module RedmineGitHosting
         private
 
         def redis_namespace
-          'git_hosting_cache'
+          0
         end
 
         def all_entries
@@ -96,7 +96,10 @@ module RedmineGitHosting
         # However, I don't know exactly how it's used by Redis...
         #
         def redis_options
-          { db: redis_namespace, driver: :hiredis }
+          options = { db: redis_namespace }
+          options[:driver] = defined?(::Redis::Connection::Hiredis) ? :hiredis : :ruby
+          options    
+          # { db: redis_namespace, driver: :hiredis }
         end
       end
     end

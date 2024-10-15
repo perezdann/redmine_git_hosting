@@ -3,10 +3,10 @@
 class RepositoryCommitsStats < ReportBase
   def commits_per_month
     data = {}
-    data[:categories] = months.reverse
+    data[:categories] = months
     data[:series]     = []
-    data[:series] << { name: l(:label_commit_plural), data: total_commits_by_month[0..11].reverse }
-    data[:series] << { name: l(:label_change_plural), data: total_changes_by_month[0..11].reverse }
+    data[:series] << { name: l(:label_commit_plural), data: total_commits_by_month[0..11] }
+    data[:series] << { name: l(:label_change_plural), data: total_changes_by_month[0..11] }
     data
   end
 

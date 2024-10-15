@@ -15,6 +15,8 @@ gem 'dalli'
 
 # Redis client for GitCache
 gem 'hiredis'
+gem 'hiredis-client'
+#gem 'redis', :require => ["redis", "redis/connection/hiredis"]
 gem 'redis'
 
 # Markdown rendering
@@ -32,8 +34,10 @@ gem 'RedCloth'
 gem 'rack-parser', require: 'rack/parser'
 
 # temp autoloading fix
-gem 'sidekiq', '<7'
+# gem 'sidekiq', '<7'
 gem 'sshkey'
+
+gem 'acts_as_positioned'
 
 group :development, :test do
   gem 'rspec'
@@ -66,3 +70,5 @@ group :development do
     gem 'slim_lint', require: false
   end
 end
+
+

@@ -46,7 +46,8 @@ class RepositoryPresenter < SimpleDelegator
   end
 
   def render_git_url_text
-    tag.input '', class: 'git_url_text', id: url_text_container_id, readonly: 'readonly'
+#    tag.input '', class: 'git_url_text', id: url_text_container_id, readonly: 'readonly'
+    tag.input class: 'git_url_text', id: url_text_container_id, readonly: 'readonly'
   end
 
   def render_permissions
