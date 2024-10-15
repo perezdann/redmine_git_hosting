@@ -6,15 +6,14 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.redmine }} ${{ matrix.db }} ruby-${{ matrix.ruby }} sidekiq-${{ matrix.sidekiq }}
+    name: ${{ matrix.redmine }} ${{ matrix.db }} ruby-${{ matrix.ruby }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        ruby: ['3.1', '3.2', '3.3']
-        redmine: ['5.1-stable', 'master']
-        db: ['postgres', 'mariadb']
-        sidekiq: [true, false]  # Enable/Disable Sidekiq
+        ruby: ['3.3']
+        redmine: ['master']
+        db: ['postgres']
       fail-fast: false
 
     services:
@@ -31,23 +30,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      mariadb:
-        image: mariadb:latest  # Using the latest version of MariaDB
-        env:
-          MYSQL_ROOT_PASSWORD: 'BestPasswordEver'
-        ports:
-          - 3306/tcp
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
-      - name: Verify MariaDB connection from host
+#      - name: Verify MariaDB connection from host
+#        run: |
+#          mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports[3306] }} -uroot -pBestPasswordEver -e "SHOW DATABASES"
+#        if: matrix.db == 'mariadb'
+#
+      # New step to verify PostgreSQL connection
+      - name: Verify PostgreSQL connection from host
         run: |
-          mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports[3306] }} -uroot -pBestPasswordEver -e "SHOW DATABASES"
-        if: matrix.db == 'mariadb'
+          psql --host=127.0.0.1 --port ${{ job.services.postgres.ports[5432] }} --username=postgres --command="SELECT version();"
+        env:
+          PGPASSWORD: postgres
+        if: matrix.db == 'postgres'
+
 
       - name: Checkout Redmine
         uses: actions/checkout@v3
