@@ -6,37 +6,36 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.redmine }} ${{ matrix.db }} ruby-${{ matrix.ruby }}
+    name: ${{ matrix.redmine }} ${{ matrix.db }} ruby-${{ matrix.ruby }} sidekiq-${{ matrix.sidekiq }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        ruby: ['2.7', '3.0', '3.1']
-        redmine: ['5.0-stable', 'master']
-        db: ['postgres', 'mysql']
+        ruby: ['3.1', '3.2', '3.3']
+        redmine: ['5.1-stable', 'master']
+        db: ['postgres', 'mariadb']
+        sidekiq: [true, false]  # Enable/Disable Sidekiq
       fail-fast: false
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:latest
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
-
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
-      mysql:
-        image: mysql:8.0
+      mariadb:
+        image: mariadb:latest  # Using the latest version of MariaDB
         env:
           MYSQL_ROOT_PASSWORD: 'BestPasswordEver'
         ports:
-          # will assign a random free host port
           - 3306/tcp
         options: >-
           --health-cmd="mysqladmin ping"
@@ -45,10 +44,10 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Verify MySQL connection from host
+      - name: Verify MariaDB connection from host
         run: |
-          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -pBestPasswordEver -e "SHOW DATABASES"
-        if: matrix.db == 'mysql'
+          mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports[3306] }} -uroot -pBestPasswordEver -e "SHOW DATABASES"
+        if: matrix.db == 'mariadb'
 
       - name: Checkout Redmine
         uses: actions/checkout@v3
@@ -68,11 +67,11 @@ jobs:
           repository: AlphaNodes/additionals
           path: redmine/plugins/additionals
 
+      # Conditionally checkout redmine_sidekiq if Sidekiq is enabled
       - name: Checkout redmine_sidekiq
+        if: matrix.sidekiq == true
         uses: actions/checkout@v3
         with:
-          # TODO Switch back to the original repo, once https://github.com/ogom/redmine_sidekiq/pull/16 is released
-          # repository: ogom/redmine_sidekiq
           repository: dosyfier/redmine_sidekiq
           ref: fix-rails-6
           path: redmine/plugins/redmine_sidekiq
@@ -94,7 +93,7 @@ jobs:
           libgpg-error-dev
           libicu-dev
           libpq-dev
-          libmysqlclient-dev
+          libmariadb-dev  # Updated MariaDB client development package
           libssh2-1
           libssh2-1-dev
           pkg-config
@@ -142,6 +141,13 @@ jobs:
           bundle exec rake generate_secret_token
           bundle exec rake db:create db:migrate redmine:plugins:migrate
           bundle exec rake db:test:prepare
+
+      # Run Sidekiq-specific steps if Sidekiq is enabled
+      - name: Start Sidekiq
+        if: matrix.sidekiq == true
+        working-directory: redmine
+        run: bundle exec sidekiq &
+
 
       - name: Install rspec file
         working-directory: redmine
