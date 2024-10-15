@@ -2137,15 +2137,17 @@ class SMTPMailer(Mailer):
                 if resp != 220:
                     raise smtplib.SMTPException("Wrong answer to the STARTTLS command")
                 if self.smtpcacerts:
-                    self.smtp.sock = ssl.wrap_socket(
-                        self.smtp.sock,
-                        ca_certs=self.smtpcacerts,
-                        cert_reqs=ssl.CERT_REQUIRED
-                        )
+                    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                    context.minimum_version = ssl.TLSVersion.TLSv1_2
+                    context.load_verify_locations(cafile=self.smtpcacerts)
+                    self.smtp.sock = context.wrap_socket(self.smtp.sock, server_hostname=self.smtpserver.split(':')[0])
                 else:
-                    self.smtp.sock = ssl.wrap_socket(
-                        self.smtp.sock,
-                        cert_reqs=ssl.CERT_NONE
+                    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                    context.minimum_version = ssl.TLSVersion.TLSv1_2
+                    self.smtp.sock = context.wrap_socket(self.smtp.sock, server_hostname=self.smtpserver.split(':')[0])
+                    self.environment.get_logger().error(
+                        '*** Warning, the server certificate is not verified (smtp) ***\n'
+                        '***          set the option smtpCACerts                   ***\n'
                         )
                     self.environment.get_logger().error(
                         '*** Warning, the server certificate is not verified (smtp) ***\n'
