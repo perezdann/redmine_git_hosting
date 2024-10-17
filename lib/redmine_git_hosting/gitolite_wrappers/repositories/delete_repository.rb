@@ -13,7 +13,7 @@ module RedmineGitHosting
         end
 
         def repository
-          @repository ||= object.symbolize_keys
+          @repository ||= object_id.symbolize_keys
         end
 
         def delete_repository

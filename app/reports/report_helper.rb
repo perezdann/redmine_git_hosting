@@ -38,7 +38,10 @@ module ReportHelper
 
   def total_by_month_for(method)
     total = [0] * 12
-    send(method).each { |c| total[(date_to.month - c.first.to_date.month) % 12] += c.last }
+    send(method).each do |date, count|
+      month_index = date.to_date.month - 1  # Get the correct month index (0-based)
+      total[month_index] += count           # Accumulate total for that month
+    end
     total
   end
 
