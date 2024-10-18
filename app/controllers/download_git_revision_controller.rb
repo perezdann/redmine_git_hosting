@@ -3,6 +3,8 @@
 class DownloadGitRevisionController < ApplicationController
   include XitoliteRepositoryFinder
 
+  protect_from_forgery with: :exception
+
   before_action :find_xitolite_repository
   before_action :can_download_git_revision
   before_action :set_download
