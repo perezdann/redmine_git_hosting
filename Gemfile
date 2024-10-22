@@ -3,10 +3,10 @@
 source 'https://rubygems.org'
 
 # Gitolite Admin repository management
-gem 'gitolite-rugged', git: 'https://github.com/jbox-web/gitolite-rugged.git', tag: '1.5.0'
+gem 'gitolite-rugged', git: 'https://github.com/redmine-git-hosting/gitolite-rugged.git'
 
 # Ruby/Rack Git Smart-HTTP Server Handler
-gem 'gitlab-grack', '~> 2.0.0', git: 'https://github.com/jbox-web/grack.git', require: 'grack', branch: 'fix_gemfile'
+gem 'gitlab-grack', git: 'https://github.com/redmine-git-hosting/grack.git', require: 'grack'
 
 gem 'redmine_plugin_kit'
 
@@ -16,7 +16,6 @@ gem 'dalli'
 # Redis client for GitCache
 gem 'hiredis'
 gem 'hiredis-client'
-#gem 'redis', :require => ["redis", "redis/connection/hiredis"]
 gem 'redis'
 
 # Markdown rendering
