@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1 - 2024-10-22
+
+- Replaced redcarpet with commonmarker to align with redmine
+
+
 ## 6.0.1 - 2022-11-04
 
 ### Changed

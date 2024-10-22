@@ -3,6 +3,7 @@
 require 'html/pipeline'
 require 'task_list/filter'
 require 'task_list/railtie'
+require 'commonmarker'
 
 module RedmineGitHosting
   module MarkdownRenderer
@@ -19,10 +20,12 @@ module RedmineGitHosting
     end
 
     def filters
-      [RedmineGitHosting::RedcarpetFilter,
-       TaskList::Filter,
-       HTML::Pipeline::AutolinkFilter,
-       HTML::Pipeline::TableOfContentsFilter]
+      [
+        RedmineGitHosting::CommonMarkFilter,
+        TaskList::Filter,
+        HTML::Pipeline::AutolinkFilter,
+        HTML::Pipeline::TableOfContentsFilter
+      ]
     end
   end
 end
