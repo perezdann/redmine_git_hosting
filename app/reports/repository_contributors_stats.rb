@@ -49,17 +49,19 @@ class RepositoryContributorsStats < ReportBase
   #
   def commits_per_author_with_aliases
     return @commits_per_author_with_aliases unless @commits_per_author_with_aliases.nil?
-
+  
     @commits_per_author_with_aliases = nil
-
     registered_committers = []
     user_committer_mapping = {}
+  
+    # Use ERB::Util.html_escape for user data
     Changeset.select('changesets.committer, changesets.user_id')
              .where(repository_id: repository.id)
              .where.not(user_id: nil)
              .group(:committer, :user_id)
              .includes(:user).each do |x|
-      name = "#{x.user.firstname} #{x.user.lastname}"
+      # Sanitize user input using Rails' built-in html_escape
+      name = ERB::Util.html_escape("#{x.user.firstname} #{x.user.lastname}").strip
       registered_committers << x.committer
       user_committer_mapping[[name, x.user.mail]] ||= []
       user_committer_mapping[[name, x.user.mail]] << x.committer
@@ -67,18 +69,33 @@ class RepositoryContributorsStats < ReportBase
 
     merged = []
     commits_by_author.each do |committer, count|
-      # skip all registered users
       next if registered_committers.include? committer
-
-      name = committer
+    
+      # Sanitize the name extraction
+      name = ERB::Util.html_escape(committer)
       loop do
         previous = name
-        name = name.gsub(/<.+@.+>/, '').strip
+        # Use safer regex handling with local variables
+        email_pattern = /<.+@.+>/
+        name = name.gsub(email_pattern, '').strip
         break if name == previous
       end
-      mail = committer[/<(.+@.+)>/, 1]
-      merged << { name: name, mail: mail, commits: count, changes: changes_by_author[committer] || 0, committers: [committer] }
+
+      # Safely extract email with regex
+      mail = nil
+      if committer =~ /<(.+@.+)>/
+        mail = ERB::Util.html_escape($1)
+      end
+
+      merged << {
+        name: name,
+        mail: mail,
+        commits: count,
+        changes: changes_by_author[committer] || 0,
+        committers: [committer]
+      }
     end
+
     user_committer_mapping.each do |identity, committers|
       count = 0
       changes = 0
@@ -86,13 +103,19 @@ class RepositoryContributorsStats < ReportBase
         count += commits_by_author[c] || 0
         changes += changes_by_author[c] || 0
       end
-      merged << { name: identity[0], mail: identity[1], commits: count, changes: changes, committers: committers }
+    
+      merged << {
+        name: identity[0],  # Already sanitized above
+        mail: identity[1],  # Email from database, trusted
+        commits: count,
+        changes: changes,
+        committers: committers
+      }
     end
 
-    # sort by name
-    merged.sort! { |x, y| x[:name] <=> y[:name] }
+    # Sort by sanitized names
+    merged.sort! { |x, y| x[:name].to_s <=> y[:name].to_s }
 
-    # merged = merged + [{name:"",commits:0,changes:0}]*(10 - merged.length) if merged.length < 10
     @commits_per_author_with_aliases = merged
     @commits_per_author_with_aliases
   end
