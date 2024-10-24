@@ -10,12 +10,13 @@ module RedmineGitHosting
 
           # Relations
           has_many :gitolite_public_keys, dependent: :destroy
-
           has_many :protected_branches_members, dependent: :destroy, foreign_key: :principal_id
           has_many :protected_branches, through: :protected_branches_members
 
           # Callbacks
           after_save :check_if_status_changed
+          after_save :handle_gitolite_user_lock
+          after_destroy :remove_from_gitolite_locked_users
         end
       end
 
@@ -70,7 +71,6 @@ module RedmineGitHosting
       # This is Rails method : saved_changes
       # However, the value is cleared before passing the object to the controller.
       # We need to save it in virtual attribute to trigger Gitolite resync if changed.
-      #
       def check_if_status_changed
         self.status_has_changed = saved_changes&.key? :status
       end
@@ -78,7 +78,62 @@ module RedmineGitHosting
       def stripped_login
         login.underscore.gsub(/[^0-9a-zA-Z]/, '_')
       end
+
+      # Handle user lock status changes
+      def handle_gitolite_user_lock
+        return unless status_has_changed?
+        
+        if status == ::User::STATUS_LOCKED
+          add_to_gitolite_locked_users
+        elsif saved_changes['status']&.first == ::User::STATUS_LOCKED
+          remove_from_gitolite_locked_users
+        end
+      end
+
+      def add_to_gitolite_locked_users
+        RedmineGitHosting.logger.info("Adding user '#{login}' to @REDMINE_LOCKED_USERS")
+        
+        admin = GitoliteAdmin.new
+        conf = admin.config
+
+        # Add or update the @all repository with deny rule
+        all_repo = conf.repos['@all'] || conf.add_repo('@all')
+        all_repo.add_permission('-', '@REDMINE_LOCKED_USERS')
+
+        # Add user to locked group
+        if conf.groups['@REDMINE_LOCKED_USERS']
+          conf.groups['@REDMINE_LOCKED_USERS'].add_user(gitolite_identifier)
+        else
+          conf.add_group('@REDMINE_LOCKED_USERS', [gitolite_identifier])
+        end
+
+        admin.save
+        GitoliteWrapper.update
+      rescue => e
+        RedmineGitHosting.logger.error("Failed to add user to locked group: #{e.message}")
+      end
+
+      def remove_from_gitolite_locked_users
+        RedmineGitHosting.logger.info("Removing user '#{login}' from @REDMINE_LOCKED_USERS")
+        
+        admin = GitoliteAdmin.new
+        conf = admin.config
+
+        # Remove user from locked group
+        if group = conf.groups['@REDMINE_LOCKED_USERS']
+          group.remove_user(gitolite_identifier)
+          
+          # Remove empty group
+          conf.groups.delete('@REDMINE_LOCKED_USERS') if group.users.empty?
+          
+          admin.save
+          GitoliteWrapper.update
+        end
+      rescue => e
+        RedmineGitHosting.logger.error("Failed to remove user from locked group: #{e.message}")
+      end
     end
+
   end
 end
 
