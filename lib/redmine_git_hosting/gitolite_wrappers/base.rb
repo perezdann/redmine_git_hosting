@@ -20,8 +20,7 @@ module RedmineGitHosting
         end
 
         def inherited(klass)
-          @wrappers ||= {}
-          @wrappers[klass.name.demodulize.underscore.to_sym] = klass
+          wrappers[klass.name.demodulize.underscore.to_sym] = klass
         end
 
         def wrappers
@@ -29,11 +28,14 @@ module RedmineGitHosting
         end
 
         def for_action(action)
-          unless wrappers.key? action
+          # Convert namespaced action to class name
+          # e.g., 'users/add_to_locked_users' -> 'add_to_locked_users'
+          action_name = action.to_s.split('/').last.to_sym
+          
+          unless wrappers.key? action_name
             raise RedmineGitHosting::Error::GitoliteWrapperException, "No available Wrapper for action '#{action}' found."
           end
-
-          wrappers[action]
+          wrappers[action_name]
         end
       end
 
