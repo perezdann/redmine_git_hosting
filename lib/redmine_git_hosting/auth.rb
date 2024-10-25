@@ -7,6 +7,9 @@ module RedmineGitHosting
       # Return if user not found
       return if user.nil?
 
+      # Return if user is locked
+      return if user.locked?
+
       # Return user if password matches
       user if user.check_password? password
     end

@@ -80,7 +80,7 @@ module RedmineGitHosting
         
         begin
           # Use GitoliteWrapper to handle the gitolite operations
-          RedmineGitHosting::GitoliteWrapper.resync_gitolite(:users/remove_from_locked_users, {
+          RedmineGitHosting::GitoliteWrapper.resync_gitolite(:remove_from_locked_users, {
             user_id: gitolite_identifier,
             update_settings: true
           })
