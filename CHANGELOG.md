@@ -1,9 +1,12 @@
 # Changelog
 
-## 6.1 - 2024-10-22
+## 6.0.3 - 2024-10-22
+
+- Use charts.js
+
+## 6.0.2 - 2024-10-22
 
 - Replaced redcarpet with commonmarker to align with redmine
-
 
 ## 6.0.1 - 2022-11-04
 

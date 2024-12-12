@@ -11,12 +11,15 @@ h2 = l :label_statistics
     li
       a href="#statistics-contributors"
         = l :label_repository_statistics_contributors
-  #statistics-global
-    = render 'repositories/statistics/global', repository: @repository
-  #statistics-commits
-    = render 'repositories/statistics/commits', repository: @repository
-  #statistics-contributors
-    = render 'repositories/statistics/contributors', repository: @repository
+
+#statistics-global
+  = render 'repositories/statistics/global', repository: @repository
+
+#statistics-commits
+  = render 'repositories/statistics/commits', repository: @repository
+
+#statistics-contributors
+  = render 'repositories/statistics/contributors', repository: @repository
 
 .clear-both style="margin: 10px;"
 
@@ -25,19 +28,12 @@ p = link_to l(:button_back), action: 'show', id: @project
 - html_title(l(:label_repository), l(:label_statistics))
 
 - content_for :header_tags do
-  = javascript_include_tag 'highcharts/highcharts', plugin: 'redmine_git_hosting'
-  = javascript_include_tag 'highcharts/modules/drilldown', plugin: 'redmine_git_hosting'
-  = stylesheet_link_tag 'application', plugin: 'redmine_git_hosting'
-  = javascript_include_tag 'set_highcharts', plugin: 'redmine_git_hosting'
+  = javascript_include_tag 'chart.js', plugin: 'redmine_git_hosting'
+  = javascript_include_tag 'set_chartjs', plugin: 'redmine_git_hosting'
+  = stylesheet_link_tag 'charts', plugin: 'redmine_git_hosting'
 
-- charts = @author_charts.map { |chart| "createZoomableAreaChart(#{chart});" }
+
 javascript:
   $(document).ready(function() {
-    createAreaChart(chart_commits_per_month);
-    createZoomableAreaChart(chart_commits_per_day);
-    createBarChart(chart_commits_per_hour);
-    createPieChart(chart_commits_per_weekday);
-    #{raw charts.join("\n")}
-    createColumnChart(chart_commits_per_author);
     $("#statistics-tabs").tabs();
   });
