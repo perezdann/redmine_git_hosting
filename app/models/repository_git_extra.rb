@@ -37,7 +37,7 @@ class RepositoryGitExtra < ActiveRecord::Base
   validate :validate_urls_order
 
   ## Serializations
-  serialize :urls_order, type: Array
+  serialize :urls_order, coder: YAML
 
   ## Callbacks
   before_save :check_urls_order_consistency
