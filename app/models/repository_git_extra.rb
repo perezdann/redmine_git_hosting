@@ -2,12 +2,15 @@
 
 class RepositoryGitExtra < ActiveRecord::Base
   include Redmine::SafeAttributes
-  include ActionView::Helpers::TranslationHelper
 
-  SMART_HTTP_OPTIONS = [[I18n.t(:label_disabled), '0'],
-                        [I18n.t(:label_http_only), '3'],
-                        [I18n.t(:label_https_only), '1'],
-                        [I18n.t(:label_https_and_http), '2']].freeze
+  def self.smart_http_options
+    [
+      [I18n.t(:label_disabled), '0'],
+      [I18n.t(:label_http_only), '3'],
+      [I18n.t(:label_https_only), '1'],
+      [I18n.t(:label_https_and_http), '2']
+    ].freeze
+  end
 
   ALLOWED_URLS = %w[ssh http https go git git_annex].freeze
 
