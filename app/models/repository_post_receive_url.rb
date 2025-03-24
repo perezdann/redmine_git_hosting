@@ -22,7 +22,7 @@ class RepositoryPostReceiveUrl < ActiveRecord::Base
   validates :mode, presence: true, inclusion: { in: %i[github get post] }
 
   ## Serializations
-  serialize :triggers, type: Array
+  serialize :triggers, coder: YAML
 
   ## Scopes
   scope :active, -> { where active: true }
