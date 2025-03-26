@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RepositoryProtectedBrancheWrapped < RepositoryProtectedBranche
-  serialize :user_list, Array
+  serialize :user_list, coder: YAML
 end
 
 class MigrateProtectedBranchesUsers < ActiveRecord::Migration[4.2]
