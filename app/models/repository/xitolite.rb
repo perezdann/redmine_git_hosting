@@ -14,7 +14,7 @@ class Repository::Xitolite < Repository::Git
   safe_attributes 'create_readme', 'enable_git_annex'
 
   # Relations
-  has_one  :extra,                  dependent: :destroy, foreign_key: 'repository_id', class_name: 'RepositoryGitExtra'
+  has_one  :git_extra,              dependent: :destroy, foreign_key: 'repository_id', class_name: 'RepositoryGitExtra'
   has_many :mirrors,                dependent: :destroy, foreign_key: 'repository_id', class_name: 'RepositoryMirror'
   has_many :post_receive_urls,      dependent: :destroy, foreign_key: 'repository_id', class_name: 'RepositoryPostReceiveUrl'
   has_many :deployment_credentials, dependent: :destroy, foreign_key: 'repository_id', class_name: 'RepositoryDeploymentCredential'
@@ -71,4 +71,12 @@ class Repository::Xitolite < Repository::Git
 
     errors.add :base, :invalid_options
   end
+
+  after_create :create_git_extra
+
+
+  def create_git_extra
+    build_git_extra.save unless git_extra
+  end
+
 end

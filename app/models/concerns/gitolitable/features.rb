@@ -15,39 +15,39 @@ module Gitolitable
     end
 
     def git_default_branch
-      extra[:default_branch]
+      git_extra&.default_branch || 'main'
     end
 
     def gitolite_hook_key
-      extra[:key]
+      git_extra&.key || false
     end
 
     def git_daemon_enabled?
-      extra[:git_daemon]
+      git_extra&.fetch(:git_annex, false) || false
     end
 
     def git_annex_enabled?
-      extra[:git_annex]
+      git_extra&.git_annex || false
     end
 
     def git_notification_enabled?
-      extra[:git_notify]
+      git_extra&.git_notify || false
     end
 
     def git_ssh_enabled?
-      extra[:git_ssh]
+      git_extra&.git_ssh || false
     end
 
     def git_go_enabled?
-      extra[:git_go]
+      git_extra&.git_go || false
     end
 
     def https_access_enabled?
-      extra[:git_https]
+      git_extra&.git_https || false
     end
 
     def http_access_enabled?
-      extra[:git_http]
+      git_extra&.git_http || false
     end
 
     def smart_http_enabled?
@@ -63,7 +63,7 @@ module Gitolitable
     end
 
     def protected_branches_enabled?
-      extra[:protected_branch]
+      git_extra&.protected_branch || false
     end
 
     def public_project?
@@ -71,11 +71,11 @@ module Gitolitable
     end
 
     def public_repo?
-      extra[:public_repo]
+      git_extra&.public_repo || false
     end
 
     def urls_order
-      extra[:urls_order]
+      git_extra&.urls_order || false
     end
   end
 end

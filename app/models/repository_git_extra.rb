@@ -3,7 +3,8 @@
 class RepositoryGitExtra < ActiveRecord::Base
   include Redmine::SafeAttributes
 
-  def self.smart_http_options
+    include Redmine::I18n
+    def self.smart_http_options
     [
       [I18n.t(:label_disabled), '0'],
       [I18n.t(:label_http_only), '3'],
@@ -54,6 +55,7 @@ class RepositoryGitExtra < ActiveRecord::Base
   private
 
   def validate_urls_order
+    self.urls_order = [] if urls_order.nil?
     urls_order.each do |url|
       errors.add :urls_order, :invalid unless ALLOWED_URLS.include? url
     end

@@ -43,6 +43,13 @@ class RepositoryGitExtrasController < RedmineGitHostingController
   private
 
   def set_git_extra
-    @git_extra = @repository.extra
+    @git_extra = @repository.git_extra || @repository.create_git_extra(
+      git_daemon: RedmineGitHosting::Config.gitolite_daemon_by_default?,
+      git_notify: RedmineGitHosting::Config.gitolite_notify_by_default?,
+      git_annex: false,
+      default_branch: 'main',
+      key: RedmineGitHosting::Utils::Crypto.generate_secret(64),
+      urls_order: []
+    )
   end
 end
