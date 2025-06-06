@@ -3,8 +3,9 @@
 source 'https://rubygems.org'
 
 # Gitolite Admin repository management
-#gem 'gitolite-rugged', git: 'https://github.com/redmine-git-hosting/gitolite-rugged.git'
-gem 'gitolite-rugged', git: 'https://github.com/criecm/gitolite-rugged.git', tag: 'rugged17'
+#rugged19
+gem 'gitolite-rugged', git: 'https://github.com/redmine-git-hosting/gitolite-rugged.git'
+#gem 'gitolite-rugged', git: 'https://github.com/criecm/gitolite-rugged.git', tag: 'rugged17'
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', git: 'https://github.com/redmine-git-hosting/grack.git', require: 'grack'
