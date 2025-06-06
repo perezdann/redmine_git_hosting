@@ -30,6 +30,14 @@ module RedmineGitHosting
         end
       end
 
+      def edit
+        super
+        # Ensure extra is initialized for Xitolite repositories
+        if @repository.is_a?(Repository::Xitolite)
+          @repository.extra ||= {}
+        end
+      end
+
       def create
         super
         call_use_cases

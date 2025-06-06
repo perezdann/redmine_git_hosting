@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'redmine_git_hosting/commonmark_filter'
 require 'html/pipeline'
 require 'task_list/filter'
 require 'task_list/railtie'
@@ -21,7 +22,7 @@ module RedmineGitHosting
 
     def filters
       [
-        RedmineGitHosting::CommonMarkFilter,
+        RedmineGitHosting::CommonmarkFilter,
         TaskList::Filter,
         HTML::Pipeline::AutolinkFilter,
         HTML::Pipeline::TableOfContentsFilter

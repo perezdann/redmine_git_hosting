@@ -10,8 +10,16 @@ module Repositories
     private
 
     def set_repository_extra
-      extra = repository.build_extra default_extra_options
-      extra.save!
+      @repository.build_git_extra(git_extra_params) unless @repository.git_extra
+      Rails.logger.info("After build_git_extra, git_extra: #{@repository.git_extra.attributes.inspect}")
+      @repository.git_extra.urls_order ||= []
+      # Force default_branch and key values
+      @repository.git_extra.attributes = {
+        default_branch: @repository.git_extra.default_branch.presence || 'master',
+        key: @repository.git_extra.key.presence || RedmineGitHosting::Utils::Crypto.generate_secret(64)
+      }
+      Rails.logger.info("After setting fallbacks, git_extra: #{@repository.git_extra.attributes.inspect}")
+      @repository.git_extra.save!
     end
 
     def default_extra_options
