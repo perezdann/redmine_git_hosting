@@ -1,12 +1,13 @@
 - if repository.is_a? Repository::Xitolite
-  = form_for repository.extra, url: repository_git_extras_path(repository), html: { method: :put, remote: true } do |f|
+  - git_extra = repository.git_extra || repository.build_git_extra
+  = form_for git_extra, url: repository_git_extras_path(repository), html: { method: :put, remote: true } do |f|
     .box.tabular
       .container
 
         .row
           .col-md-12
             #xitolite-messages
-              = error_messages_for repository.extra
+              = error_messages_for git_extra
 
         .row
           .col-md-6
@@ -59,7 +60,7 @@
                 - if repository.branches.present?
                   = f.select :default_branch,
                              repository_branches_list(repository.branches,
-                                                      selected: @repository&.extra&.default_branch)
+                                                      selected: git_extra.default_branch)
                 - else
                   span.label.label-info = repository.git_default_branch
 

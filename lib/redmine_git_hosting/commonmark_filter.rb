@@ -14,16 +14,9 @@ module RedmineGitHosting
 
     # Convert Markdown to HTML using Commonmarker
     def call
-      html = self.class.renderer.render(@text)
+      html = CommonMarker.render_html(@text, :DEFAULT, [:table, :autolink, :strikethrough])
       html.rstrip!
       html
-    end
-
-    def self.renderer
-      @renderer ||= CommonMarker::Renderer::HTML.new(
-        :DEFAULT,
-        extensions: %i[table autolink strikethrough]
-      )
     end
   end
 end

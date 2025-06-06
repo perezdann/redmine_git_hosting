@@ -6,7 +6,7 @@ Redmine::Scm::Base.add 'Xitolite'
 module RedmineGitHosting
   extend self
 
-  VERSION = '6.0.1'
+  VERSION = '6.0.3'
 
   # Load RedminePluginLoader
   extend RedminePluginLoader
