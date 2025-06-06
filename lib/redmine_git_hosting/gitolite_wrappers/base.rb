@@ -5,18 +5,18 @@ module RedmineGitHosting
     class Base
       include RedmineGitHosting::GitoliteAccessor::Methods
 
-      attr_reader :admin, :object_id, :options, :gitolite_config
+      attr_reader :admin, :target_object_id, :options, :gitolite_config
 
-      def initialize(admin, object_id, **options)
-        @admin           = admin
-        @object_id       = object_id
-        @options         = options
-        @gitolite_config = admin.config
+      def initialize(admin, target_object_id, **options)
+        @admin            = admin
+        @target_object_id = target_object_id
+        @options          = options
+        @gitolite_config  = admin.config
       end
 
       class << self
-        def call(admin, object_id, **options)
-          new(admin, object_id, **options).call
+        def call(admin, target_object_id, **options)
+          new(admin, target_object_id, **options).call
         end
 
         def inherited(klass)
@@ -31,7 +31,6 @@ module RedmineGitHosting
           # Convert namespaced action to class name
           # e.g., 'users/add_to_locked_users' -> 'add_to_locked_users'
           action_name = action.to_s.split('/').last.to_sym
-          
           unless wrappers.key? action_name
             raise RedmineGitHosting::Error::GitoliteWrapperException, "No available Wrapper for action '#{action}' found."
           end
