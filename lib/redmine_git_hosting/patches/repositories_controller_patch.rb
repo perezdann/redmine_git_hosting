@@ -6,14 +6,13 @@ module RedmineGitHosting
   module Patches
     module RepositoriesControllerPatch
       include RedmineGitHosting::GitoliteAccessor::Methods
+
       def self.prepended(base)
         base.class_eval do
           before_action :set_current_tab, only: :edit
-
           helper :git_hosting
           helper :additionals_clipboardjs
           helper :watchers
-
           # Load ExtendRepositoriesHelper so we can call our
           # additional methods.
           helper :extend_repositories
@@ -32,9 +31,16 @@ module RedmineGitHosting
 
       def edit
         super
-        # Ensure extra is initialized for Xitolite repositories
-        if @repository.is_a?(Repository::Xitolite)
-          @repository.extra ||= {}
+        # Ensure git_extra is initialized for Xitolite repositories
+        if @repository.is_a?(Repository::Xitolite) && @repository.git_extra.nil?
+          @repository.build_git_extra(
+            git_daemon: RedmineGitHosting::Config.gitolite_daemon_by_default?,
+            git_notify: RedmineGitHosting::Config.gitolite_notify_by_default?,
+            git_annex: false,
+            default_branch: 'main',
+            key: RedmineGitHosting::Utils::Crypto.generate_secret(64),
+            urls_order: []
+          ).save
         end
       end
 
@@ -147,8 +153,10 @@ module RedmineGitHosting
             User.current.pref[:diff_type] = @diff_type
             User.current.preference.save
           end
+
           @cache_key = "repositories/diff/#{@repository.id}/" +
                        Digest::MD5.hexdigest("#{@path}-#{@rev}-#{@rev_to}-#{@diff_type}-#{current_language}")
+
           unless read_fragment @cache_key
             @diff = @repository.diff @path, @rev, @rev_to
             unless @diff
