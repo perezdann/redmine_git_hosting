@@ -1,6 +1,9 @@
 ---
 # Gitolite SSH Config
 gitolite_user:                  'git'
+---
+# Gitolite SSH Config
+gitolite_user:                  'git'
 gitolite_server_host:           '127.0.0.1'
 gitolite_server_port:           '22'
 gitolite_ssh_private_key:       <%= Rails.root.join('plugins', 'redmine_git_hosting', 'ssh_keys', 'redmine_gitolite_admin_id_rsa') %>
@@ -67,3 +70,4 @@ gitolite_notify_global_exclude:        []
 
 # Sidekiq Config
 gitolite_use_sidekiq:                  'false'
+
