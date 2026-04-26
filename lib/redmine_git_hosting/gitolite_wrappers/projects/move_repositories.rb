@@ -22,7 +22,7 @@ module RedmineGitHosting
         end
 
         def projects
-          @projects ||= Project.find_by(id: object_id).self_and_descendants
+          @projects ||= Project.find_by(id: target_object_id).self_and_descendants
         end
       end
     end

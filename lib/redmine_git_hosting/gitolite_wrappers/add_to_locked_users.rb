@@ -3,6 +3,7 @@ module RedmineGitHosting
     class AddToLockedUsers < Base
       def call
         conf = gitolite_config
+        user_id = target_object_id[:user_id]
         # Add or update the @all repository with deny rule
         all_repo = conf.repos['@all'] || Gitolite::Config::Repo.new('@all')
         conf.add_repo(all_repo) unless conf.repos['@all']
@@ -13,11 +14,11 @@ module RedmineGitHosting
         # Add user to locked group
         group = conf.groups['@REDMINE_LOCKED_USERS']
         if group
-          group.add_user(object_id.to_s) unless group.users.include?(object_id.to_s)
+          group.add_user(user_id.to_s) unless group.users.include?(user_id.to_s)
         else
-          conf.add_group('@REDMINE_LOCKED_USERS', [object_id.to_s])
+          conf.add_group('@REDMINE_LOCKED_USERS', [user_id.to_s])
         end
-        gitolite_admin_repo_commit("Add user #{object_id} to @REDMINE_LOCKED_USERS")
+        gitolite_admin_repo_commit("Add user #{user_id} to @REDMINE_LOCKED_USERS")
       end
     end
   end
