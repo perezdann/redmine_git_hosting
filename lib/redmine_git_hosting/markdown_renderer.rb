@@ -2,8 +2,6 @@
 
 require 'redmine_git_hosting/commonmark_filter'
 require 'html/pipeline'
-require 'task_list/filter'
-require 'task_list/railtie'
 require 'commonmarker'
 
 module RedmineGitHosting
@@ -23,7 +21,6 @@ module RedmineGitHosting
     def filters
       [
         RedmineGitHosting::CommonmarkFilter,
-        TaskList::Filter,
         HTML::Pipeline::AutolinkFilter,
         HTML::Pipeline::TableOfContentsFilter
       ]
